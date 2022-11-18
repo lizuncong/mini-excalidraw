@@ -6,7 +6,8 @@
 
 ## 流程
 drawing -> element -> render(roughjs) -> scene
->数据驱动页面更新
+- 数据驱动页面更新
+- actionManager管理全局的行为，比如撤销重做等
 ## 元素绘制
 Excalidraw借助浏览器基础鼠标事件：onPointerUp、onPointerDown、onPointerMove 记录用户的行为轨迹。比如如果在工具栏选择矩形，在画布内第一次 pointerDown 事件代表绘制开始（标记起始点），后面的 pointerMove 事件改变矩形宽高（当前点位与起始点差值），pointerMove 事件代表绘制完成。其它的图形绘制与此类似。
 
@@ -24,10 +25,18 @@ Excalidraw使用一个History对象保存操作历史，其中用一个数组栈
 
 ## 目前发现的不足
 - 功能上
-    - socket.io同步状态还是会有一定的延迟
     - 多人协作撤销重做暂未实现
     - 撤销重做有点设计缺陷。比如添加一个元素el1，对el1操作15次，然后撤销5次，再添加一个新的元素el2，此时点击一次撤销，再点击2次重做，会发现el1已经无法重做了，不知是设计如此，还是bug？
 
 - 代码上
     - 代码组织混乱，比如组件的组织方式
     - pc端和移动端监听事件耦合在一起。比如在同一个onPointerUp判断是pc端还是移动端的事件，理论上这两者逻辑需要解耦
+
+
+
+
+
+## 源码笔记
+- onPoinerDown
+    - 调用savePointer保存第一次点击事件的信息，其中需要将视图坐标转换成Scene坐标
+        - 转换需要考虑zoom缩放比例以及水平和垂直方向的位移
